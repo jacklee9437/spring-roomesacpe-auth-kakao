@@ -1,9 +1,21 @@
+CREATE TABLE member
+(
+    id       bigint      not null auto_increment,
+    username varchar(20) not null unique,
+    password varbinary(512) not null,
+    name     varchar(20) not null,
+    phone    varchar(20) not null unique,
+    role     enum('ADMIN', 'USER') not null,
+    primary key (id)
+);
+
 CREATE TABLE reservation
 (
     id          bigint      not null auto_increment,
     schedule_id bigint      not null,
     member_id   bigint      not null,
-    primary key (id)
+    primary key (id),
+    foreign key (member_id) references member(id) on delete set null
 );
 
 CREATE TABLE theme
@@ -21,16 +33,5 @@ CREATE TABLE schedule
     theme_id bigint not null,
     date     date   not null,
     time     time   not null,
-    primary key (id)
-);
-
-CREATE TABLE member
-(
-    id       bigint      not null auto_increment,
-    username varchar(20) not null unique,
-    password varbinary(512) not null,
-    name     varchar(20) not null,
-    phone    varchar(20) not null unique,
-    role     enum('ADMIN', 'USER') not null,
     primary key (id)
 );
