@@ -17,7 +17,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
 @DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD)
 public class ScheduleE2ETest {
-
+    private static final String URL = "/schedules";
     private Long themeId;
 
     @BeforeEach
@@ -50,7 +50,7 @@ public class ScheduleE2ETest {
                 .given().log().all()
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .body(body)
-                .when().post("/schedules")
+                .when().post(URL)
                 .then().log().all()
                 .statusCode(HttpStatus.CREATED.value());
     }
@@ -64,7 +64,7 @@ public class ScheduleE2ETest {
                 .given().log().all()
                 .param("themeId", themeId)
                 .param("date", "2022-08-11")
-                .when().get("/schedules")
+                .when().get(URL)
                 .then().log().all()
                 .statusCode(HttpStatus.OK.value())
                 .extract();
@@ -92,7 +92,7 @@ public class ScheduleE2ETest {
                 .given().log().all()
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .body(body)
-                .when().post("/schedules")
+                .when().post(URL)
                 .then().log().all()
                 .statusCode(HttpStatus.CREATED.value())
                 .extract()

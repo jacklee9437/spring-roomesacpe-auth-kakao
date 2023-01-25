@@ -22,6 +22,7 @@ public class MemberE2ETest {
     private static final String PASSWORD = "password";
     private static final String NAME = "jay";
     private static final String PHONE = "010-1234-5678";
+    private static final String URL = "/members";
 
     @DisplayName("중복이 없는 username 과 phone 으로 멤버 생성시 생성되어야 한다")
     @Test
@@ -31,7 +32,7 @@ public class MemberE2ETest {
                 .given().log().all()
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .body(body)
-                .when().post("/members")
+                .when().post(URL)
                 .then().log().all()
                 .statusCode(HttpStatus.CREATED.value());
     }
@@ -48,7 +49,7 @@ public class MemberE2ETest {
                 .given().log().all()
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .body(oldMember)
-                .when().post("/members")
+                .when().post(URL)
                 .then().log().all()
                 .statusCode(HttpStatus.CREATED.value());
 
@@ -57,7 +58,7 @@ public class MemberE2ETest {
                 .given().log().all()
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .body(newMember)
-                .when().post("/members")
+                .when().post(URL)
                 .then().log().all()
                 .statusCode(HttpStatus.BAD_REQUEST.value());
     }
@@ -68,20 +69,20 @@ public class MemberE2ETest {
         MemberRequest memberRequest = new MemberRequest(USERNAME, PASSWORD, NAME, PHONE);
         RestAssured
                 .given().contentType(MediaType.APPLICATION_JSON_VALUE).body(memberRequest)
-                .when().post("/members")
+                .when().post(URL)
                 .then().statusCode(HttpStatus.CREATED.value());
 
         TokenRequest tokenRequest = new TokenRequest(USERNAME, PASSWORD);
         String accessToken = RestAssured
                 .given().contentType(MediaType.APPLICATION_JSON_VALUE).body(tokenRequest)
-                .when().post("/login/token")
+                .when().post("login/token")
                 .then().statusCode(HttpStatus.OK.value()).extract().as(TokenResponse.class).getAccessToken();
 
         Member member = RestAssured
                 .given().log().all()
                 .auth().oauth2(accessToken)
                 .accept(MediaType.APPLICATION_JSON_VALUE)
-                .when().get("/members/me")
+                .when().get(URL + "/me")
                 .then().log().all()
                 .statusCode(HttpStatus.OK.value()).extract().as(Member.class);
 
@@ -94,7 +95,7 @@ public class MemberE2ETest {
         RestAssured
                 .given().log().all()
                 .accept(MediaType.APPLICATION_JSON_VALUE)
-                .when().get("/members/me")
+                .when().get(URL + "/me")
                 .then().log().all()
                 .statusCode(HttpStatus.UNAUTHORIZED.value());
     }

@@ -22,8 +22,9 @@ import static org.assertj.core.api.Assertions.assertThat;
 @DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
 class ReservationE2ETest {
-    public static final String DATE = "2022-08-11";
-    public static final String TIME = "13:00";
+    private static final String DATE = "2022-08-11";
+    private static final String TIME = "13:00";
+    private static final String URL = "/reservations";
 
     private ReservationRequest request;
     private Long themeId;
@@ -73,7 +74,7 @@ class ReservationE2ETest {
                 .body(request)
                 .auth().oauth2(accessToken)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when().post("/reservations")
+                .when().post(URL)
                 .then().log().all().statusCode(HttpStatus.CREATED.value())
                 .extract();
 
@@ -87,7 +88,7 @@ class ReservationE2ETest {
                 .given().log().all()
                 .body(request)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when().post("/reservations")
+                .when().post(URL)
                 .then().log().all().statusCode(HttpStatus.UNAUTHORIZED.value());
     }
 
@@ -100,7 +101,7 @@ class ReservationE2ETest {
                 .given().log().all()
                 .param("themeId", themeId)
                 .param("date", DATE)
-                .when().get("/reservations")
+                .when().get(URL)
                 .then().log().all()
                 .extract();
 
@@ -145,7 +146,7 @@ class ReservationE2ETest {
                 .auth().oauth2(accessToken)
                 .body(request)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when().post("/reservations")
+                .when().post(URL)
                 .then().log().all()
                 .extract();
 
@@ -159,7 +160,7 @@ class ReservationE2ETest {
                 .given().log().all()
                 .param("themeId", themeId)
                 .param("date", DATE)
-                .when().get("/reservations")
+                .when().get(URL)
                 .then().log().all()
                 .extract();
 
@@ -173,7 +174,7 @@ class ReservationE2ETest {
         var response = RestAssured
                 .given().log().all()
                 .auth().oauth2(accessToken)
-                .when().delete("/reservations/1")
+                .when().delete(URL + "/1")
                 .then().log().all()
                 .extract();
 
@@ -186,7 +187,7 @@ class ReservationE2ETest {
                 .body(request)
                 .auth().oauth2(accessToken)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when().post("/reservations")
+                .when().post(URL)
                 .then().log().all()
                 .extract();
     }

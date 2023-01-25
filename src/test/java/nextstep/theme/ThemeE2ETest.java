@@ -17,8 +17,11 @@ import static org.assertj.core.api.Assertions.assertThat;
 @DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
 public class ThemeE2ETest {
+    private static final String URL = "/admin/themes";
+    private static final String PATH_DELIMITER = "/";
     private String accessTokenOfUserRole;
     private String accessTokenOfAdminRole;
+    private ThemeRequest themeRequest;
 
     @BeforeEach
     void setUp() {
@@ -42,19 +45,19 @@ public class ThemeE2ETest {
                 .given().contentType(MediaType.APPLICATION_JSON_VALUE).body(tokenRequestOfAdmin)
                 .when().post("/login/token")
                 .then().statusCode(HttpStatus.OK.value()).extract().as(TokenResponse.class).getAccessToken();
+        themeRequest = new ThemeRequest("테마이름", "테마설명", 22000);
     }
 
 
     @DisplayName("관리자 권한으로 테마를 생성시 생성되어야 한다")
     @Test
     public void createWithAdmin() {
-        ThemeRequest body = new ThemeRequest("테마이름", "테마설명", 22000);
         RestAssured
                 .given().log().all()
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .auth().oauth2(accessTokenOfAdminRole)
-                .body(body)
-                .when().post("/admin/themes")
+                .body(themeRequest)
+                .when().post(URL)
                 .then().log().all()
                 .statusCode(HttpStatus.CREATED.value());
     }
@@ -62,13 +65,12 @@ public class ThemeE2ETest {
     @DisplayName("사용자 권한으로 테마를 생성시 예외처리 되어야 한다")
     @Test
     public void createWithUser() {
-        ThemeRequest body = new ThemeRequest("테마이름", "테마설명", 22000);
         RestAssured
                 .given().log().all()
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .auth().oauth2(accessTokenOfUserRole)
-                .body(body)
-                .when().post("/admin/themes")
+                .body(themeRequest)
+                .when().post(URL)
                 .then().log().all()
                 .statusCode(HttpStatus.UNAUTHORIZED.value());
     }
@@ -82,7 +84,7 @@ public class ThemeE2ETest {
                 .given().log().all()
                 .param("date", "2022-08-11")
                 .auth().oauth2(accessTokenOfAdminRole)
-                .when().get("/admin/themes")
+                .when().get(URL)
                 .then().log().all()
                 .statusCode(HttpStatus.OK.value())
                 .extract();
@@ -98,7 +100,7 @@ public class ThemeE2ETest {
                 .given().log().all()
                 .param("date", "2022-08-11")
                 .auth().oauth2(accessTokenOfUserRole)
-                .when().get("/admin/themes")
+                .when().get(URL)
                 .then().log().all()
                 .statusCode(HttpStatus.UNAUTHORIZED.value());
     }
@@ -111,7 +113,7 @@ public class ThemeE2ETest {
         var response = RestAssured
                 .given().log().all()
                 .auth().oauth2(accessTokenOfAdminRole)
-                .when().delete("/admin/themes/" + id)
+                .when().delete(URL + PATH_DELIMITER + id)
                 .then().log().all()
                 .extract();
 
@@ -126,19 +128,18 @@ public class ThemeE2ETest {
         RestAssured
                 .given().log().all()
                 .auth().oauth2(accessTokenOfUserRole)
-                .when().delete("/admin/themes/" + id)
+                .when().delete(URL + PATH_DELIMITER + id)
                 .then().log().all()
                 .statusCode(HttpStatus.UNAUTHORIZED.value());
     }
 
     public Long createTheme() {
-        ThemeRequest body = new ThemeRequest("테마이름", "테마설명", 22000);
         String location = RestAssured
                 .given().log().all()
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .body(body)
+                .body(themeRequest)
                 .auth().oauth2(accessTokenOfAdminRole)
-                .when().post("/admin/themes")
+                .when().post(URL)
                 .then().log().all()
                 .statusCode(HttpStatus.CREATED.value())
                 .extract().header("Location");

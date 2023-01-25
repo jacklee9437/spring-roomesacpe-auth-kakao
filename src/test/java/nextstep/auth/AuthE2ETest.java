@@ -17,8 +17,9 @@ import static org.assertj.core.api.Assertions.assertThat;
 @DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
 public class AuthE2ETest {
-    public static final String USERNAME = "jay";
-    public static final String PASSWORD = "1234";
+    private static final String USERNAME = "jay";
+    private static final String PASSWORD = "1234";
+    private static final String URL = "/login/token";
 
     @BeforeEach
     void setUp() {
@@ -41,7 +42,7 @@ public class AuthE2ETest {
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .accept(MediaType.APPLICATION_JSON_VALUE)
                 .body(body)
-                .when().post("/login/token")
+                .when().post(URL)
                 .then().log().all()
                 .statusCode(HttpStatus.OK.value())
                 .extract();
@@ -58,12 +59,12 @@ public class AuthE2ETest {
     }, delimiter = ';')
     public void createAbnormally(String userName, String password) {
         TokenRequest body = new TokenRequest(userName, password);
-        var response = RestAssured
+        RestAssured
                 .given().log().all()
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .accept(MediaType.APPLICATION_JSON_VALUE)
                 .body(body)
-                .when().post("/login/token")
+                .when().post(URL)
                 .then().log().all()
                 .statusCode(HttpStatus.UNAUTHORIZED.value());
     }
